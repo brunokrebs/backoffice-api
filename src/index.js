@@ -61,7 +61,7 @@ app.delete('/:id', async (req, res) => {
 // endpoint to update a product
 app.put('/:id', async (req, res) => {
     const updatedProduct = req.body;
-    await updateProduct(req.params.id, updatedAd);
+    await updateProduct(req.params.id, updatedProduct);
     res.send({ message: 'Product updated.' });
 });
 
