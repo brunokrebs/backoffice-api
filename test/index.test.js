@@ -2,7 +2,7 @@ const chai = require('chai');
 const chaiHttp = require('chai-http');
 const should = chai.should();
 const app= require('../src/index');
-
+const { insertProduct } = require('../src/database/products');
 chai.use(chaiHttp);
 
 describe('Products', () => {
@@ -22,7 +22,7 @@ describe('Products', () => {
   // Test the POST route
   describe('/POST Product', () => {
     it('it should POST a new product', (done) => {
-      let title = { title: 'A new product' }
+      let title = { title: 'A new product' };
       chai.request(app)
         .post('/')
         .send(title)
@@ -31,6 +31,37 @@ describe('Products', () => {
           res.body.should.be.a('object');
           res.body.should.have.property('message');
          done();
+        });
+    });
+  });
+
+//  Test the PUT route
+  describe('/PUT product', () => {
+    it('it should update a product', async () => {
+      let product = await insertProduct({ title: 'A product to be deleted actually.'})
+      chai.request(app)
+        .put('/' + product)
+        .send({title: 'Updated product'})
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.body.should.be.a('object');
+          res.body.should.have.property('message').eql('Product updated.');
+        });
+    });
+  });
+
+  //  Test the DELETE route - Currently failing.
+  // Current Problem - Test doesn't break out. If callback `done` is added to the async function handler, another error occurs.
+
+  describe('/DELETE product', () => {
+    it('it should delete a product', async () => {
+      let product = await insertProduct({ title: 'A product to be deleted actually.'});
+      chai.request(app)
+        .delete('/' + product)
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.body.should.be.a('object');
+          res.body.should.have.property('message').eql('Product removed.');
         });
     });
   });
