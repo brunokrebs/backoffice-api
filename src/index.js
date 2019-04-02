@@ -44,7 +44,7 @@ const checkJwt = jwt({
   algorithms: ['RS256']
 });
 
-app.use(checkJwt);
+// app.use(checkJwt);
 
 app.post('/', async (req, res) => {
   const newProduct = req.body;
