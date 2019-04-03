@@ -35,7 +35,21 @@ describe('Products', () => {
     });
   });
 
-//  Test the PUT route
+  describe('/DELETE product', () => {
+    it('it should delete a product', async () => {
+      let product = await insertProduct({ title: 'A product to be deleted actually.'});
+      console.log(product);
+      chai.request(app)
+        .delete('/' + product)
+        .end((err, res) => {
+          res.should.have.status(200);
+          res.body.should.be.a('object');
+          res.body.should.have.property('message').eql('Product removed.');
+        });
+    });
+  });
+
+  //  Test the PUT route
   describe('/PUT product', () => {
     it('it should update a product', async () => {
       let product = await insertProduct({ title: 'A product to be deleted actually.'})
@@ -46,22 +60,6 @@ describe('Products', () => {
           res.should.have.status(200);
           res.body.should.be.a('object');
           res.body.should.have.property('message').eql('Product updated.');
-        });
-    });
-  });
-
-  //  Test the DELETE route - Currently failing.
-  // Current Problem - Test doesn't break out. If callback `done` is added to the async function handler, another error occurs.
-
-  describe('/DELETE product', () => {
-    it('it should delete a product', async () => {
-      let product = await insertProduct({ title: 'A product to be deleted actually.'});
-      chai.request(app)
-        .delete('/' + product)
-        .end((err, res) => {
-          res.should.have.status(200);
-          res.body.should.be.a('object');
-          res.body.should.have.property('message').eql('Product removed.');
         });
     });
   });
