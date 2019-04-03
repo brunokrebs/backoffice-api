@@ -1,26 +1,26 @@
-const { MongoMemoryServer } = require('mongodb-memory-server');
 const { MongoClient } = require('mongodb');
 
+let connection = null;
 let database = null;
 
-async function startDatabase() {
-  const mongo = new MongoMemoryServer({
-    debug: true,
-    binary: { systemBinary: '/usr/bin/mongod' }
-  });
-  const mongoDBURL = await mongo.getConnectionString();
-  const connection = await MongoClient.connect(mongoDBURL, {
+async function connectToDatabase() {
+  connection = await MongoClient.connect(process.env.MONGO_DB_URL, {
     useNewUrlParser: true
   });
   database = connection.db();
 }
 
 async function getDatabase() {
-  if (!database) await startDatabase();
+  if (!database) await connectToDatabase();
   return database;
 }
 
+async function disconnectFromDatabase() {
+  if (connection) return await connection.close();
+}
+
 module.exports = {
-  getDatabase,
-  startDatabase
+  connectToDatabase,
+  disconnectFromDatabase,
+  getDatabase
 };
