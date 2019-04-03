@@ -1,13 +1,16 @@
-const { MongoClient } = require('mongodb');
-
+const MongoClient = require('mongoose');
+const productsDb = require('./product.model');
 let connection = null;
-let database = null;
+let database = productsDb;
 
 async function connectToDatabase() {
-  connection = await MongoClient.connect(process.env.MONGO_DB_URL, {
-    useNewUrlParser: true
-  });
-  database = connection.db();
+  connection = await MongoClient.connect(
+    'mongodb://localhost:27017/backoffice',
+    {
+      useNewUrlParser: true,
+      useCreateIndex: true
+    }
+  );
 }
 
 async function getDatabase() {
