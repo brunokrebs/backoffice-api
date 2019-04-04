@@ -14,7 +14,7 @@ let mongoServer;
 
 describe('Products', () => {
   before(async () => {
-    mongoServer = new MongoMemoryServer();
+    mongoServer = new MongoMemoryServer({ binary: { systemBinary: '/usr/bin/mongod' } });
     const mongoUri = await mongoServer.getConnectionString();
     process.env.MONGO_DB_URL = mongoUri;
 
@@ -36,15 +36,16 @@ describe('Products', () => {
   // Test the POST route
   describe('/POST Product', () => {
     it('it should POST a new product', () => {
-      let title = { title: 'A new product' };
+      let product = { title: 'A new product' };
       chai
         .request(server)
         .post('/')
-        .send(title)
+        .send(product)
         .end((err, res) => {
           res.should.have.status(200);
           res.body.should.be.a('object');
           res.body.should.have.property('message');
+          res.body.should.have.property('product').eql(product.title);
         });
     });
   });
@@ -68,8 +69,9 @@ describe('Products', () => {
   describe('/PUT product', () => {
     it('it should update a product', async () => {
       const product = new Product({
-        title: 'A product to be deleted actually.'
+        title: 'Wrong product.'
       });
+      await product.save();
       chai
         .request(server)
         .put('/' + product._id)
@@ -78,12 +80,13 @@ describe('Products', () => {
           res.should.have.status(200);
           res.body.should.be.a('object');
           res.body.should.have.property('message').eql('Product updated.');
+          res.body.should.have.property('updatedProduct').eql({ title: 'Updated product' });
         });
     });
   });
 
   after(async () => {
-    await mongoServer.stop();
     await disconnectFromDatabase();
+    await mongoServer.stop();
   });
 });
