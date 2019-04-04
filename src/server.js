@@ -22,7 +22,7 @@ app.get('/', async (req, res) => {
 app.post('/', async (req, res) => {
   const newProduct = new Product(req.body);
   await newProduct.save();
-  res.send({ message: 'New product inserted.' });
+  res.send({ message: 'New product inserted.', product: newProduct.title });
 });
 
 // endpoint to delete a product
@@ -41,7 +41,7 @@ app.put('/:id', async (req, res) => {
       }
     }
   );
-  res.send({ message: 'Product updated.' });
+  res.send({ message: 'Product updated.', updatedProduct: req.body });
 });
 
 module.exports = app;
