@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
-const products = new Schema(
+const productSchema = new Schema(
   {
     title: {
       type: String,
@@ -11,8 +11,8 @@ const products = new Schema(
   { collection: 'products' }
 );
 
-products.index({ title: 1 }, { unique: true });
+productSchema.index({ title: 1 }, { unique: true });
 
-let productsModel = mongoose.model('Products', products);
+const Product = mongoose.model('Product', productSchema);
 
-module.exports = productsModel;
+module.exports = Product;

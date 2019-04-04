@@ -1,29 +1,25 @@
-const MongoClient = require('mongoose');
-const productsDb = require('./product.model');
-let connection = null;
-let database = productsDb;
+const mongoose = require('mongoose');
+
+let connected = false;
 
 async function connectToDatabase() {
-  connection = await MongoClient.connect(
-    'mongodb://localhost:27017/backoffice',
-    {
-      useNewUrlParser: true,
-      useCreateIndex: true
-    }
-  );
-}
+  return new Promise(resolve => {
+    mongoose.connect(process.env.MONGO_DB_URL, {
+      useNewUrlParser: true
+    });
 
-async function getDatabase() {
-  if (!database) await connectToDatabase();
-  return database;
+    mongoose.connection.once('open', function() {
+      connected = true;
+      resolve();
+    });
+  });
 }
 
 async function disconnectFromDatabase() {
-  if (connection) return await connection.close();
+  if (connected) return await mongoose.disconnect();
 }
 
 module.exports = {
   connectToDatabase,
-  disconnectFromDatabase,
-  getDatabase
+  disconnectFromDatabase
 };

@@ -1,24 +1,24 @@
 const chai = require('chai');
 const chaiHttp = require('chai-http');
+const {
+  connectToDatabase,
+  disconnectFromDatabase
+} = require('../src/database/mongo');
 const should = chai.should();
-const { disconnectFromDatabase } = require('../src/database/mongo');
 const server = require('../src/server');
-const { insertProduct } = require('../src/database/products');
+const Product = require('../src/database/product.model');
 const { MongoMemoryServer } = require('mongodb-memory-server');
-const { MongoClient } = require('mongodb');
 chai.use(chaiHttp);
 
-let con;
-let db;
 let mongoServer;
 
 describe('Products', () => {
   before(async () => {
     mongoServer = new MongoMemoryServer();
     const mongoUri = await mongoServer.getConnectionString();
-    con = await MongoClient.connect(mongoUri, { useNewUrlParser: true });
-    db = con.db(await mongoServer.getDbName());
     process.env.MONGO_DB_URL = mongoUri;
+
+    await connectToDatabase();
   });
 
   describe('/GET Products', () => {
@@ -51,13 +51,12 @@ describe('Products', () => {
 
   describe('/DELETE product', () => {
     it('it should delete a product', async () => {
-      let product = await insertProduct({
+      const product = new Product({
         title: 'A product to be deleted actually.'
       });
-      console.log(product);
       chai
         .request(server)
-        .delete('/' + product)
+        .delete('/' + product._id)
         .end((err, res) => {
           res.should.have.status(200);
           res.body.should.be.a('object');
@@ -68,12 +67,12 @@ describe('Products', () => {
 
   describe('/PUT product', () => {
     it('it should update a product', async () => {
-      let product = await insertProduct({
+      const product = new Product({
         title: 'A product to be deleted actually.'
       });
       chai
         .request(server)
-        .put('/' + product)
+        .put('/' + product._id)
         .send({ title: 'Updated product' })
         .end((err, res) => {
           res.should.have.status(200);
@@ -84,8 +83,7 @@ describe('Products', () => {
   });
 
   after(async () => {
-    if (con) con.close();
-    if (mongoServer) await mongoServer.stop();
+    await mongoServer.stop();
     await disconnectFromDatabase();
   });
 });
