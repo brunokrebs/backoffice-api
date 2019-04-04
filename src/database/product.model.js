@@ -5,7 +5,8 @@ const productSchema = new Schema(
   {
     title: {
       type: String,
-      trim: true
+      trim: true,
+      required: true
     }
   },
   { collection: 'products' }
