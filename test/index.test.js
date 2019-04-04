@@ -14,7 +14,9 @@ let mongoServer;
 
 describe('Products', () => {
   before(async () => {
-    mongoServer = new MongoMemoryServer({ binary: { systemBinary: '/usr/bin/mongod' } });
+    mongoServer = new MongoMemoryServer({
+      binary: { systemBinary: '/usr/bin/mongod' }
+    });
     const mongoUri = await mongoServer.getConnectionString();
     process.env.MONGO_DB_URL = mongoUri;
 
@@ -80,7 +82,20 @@ describe('Products', () => {
           res.should.have.status(200);
           res.body.should.be.a('object');
           res.body.should.have.property('message').eql('Product updated.');
-          res.body.should.have.property('updatedProduct').eql({ title: 'Updated product' });
+        });
+    });
+  });
+
+  describe('/PUT product', () => {
+    it('it should return an update a product error', async () => {
+      chai
+        .request(server)
+        .put('/123456789')
+        .send({ title: 'Updated product' })
+        .end((err, res) => {
+          res.should.have.status(400);
+          res.body.should.be.a('object');
+          res.body.should.have.property('error').eql('Unable to update product');
         });
     });
   });
