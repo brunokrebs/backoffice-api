@@ -33,15 +33,19 @@ app.delete('/:id', async (req, res) => {
 
 // endpoint to update a product
 app.put('/:id', async (req, res) => {
-  await Product.updateOne(
-    { _id: req.params.id },
-    {
-      $set: {
-        ...req.body
+  try {
+    await Product.updateOne(
+      { _id: req.params.id },
+      {
+        $set: {
+          ...req.body
+        }
       }
-    }
-  );
-  res.send({ message: 'Product updated.', updatedProduct: req.body });
+    );
+    res.send({ message: 'Product updated.' });
+  } catch (err) {
+    res.status(400).send({ error: 'Unable to update product' });
+  }
 });
 
 module.exports = app;
