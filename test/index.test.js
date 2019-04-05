@@ -86,7 +86,7 @@ describe('Products', () => {
     });
   });
 
-  describe('/PUT product', () => {
+  describe('Erroneous /PUT product', () => {
     it('it should return an update a product error', async () => {
       chai
         .request(server)
@@ -95,7 +95,9 @@ describe('Products', () => {
         .end((err, res) => {
           res.should.have.status(400);
           res.body.should.be.a('object');
-          res.body.should.have.property('error').eql('Unable to update product');
+          res.body.should.have
+            .property('error')
+            .eql('Unable to update product');
         });
     });
   });
