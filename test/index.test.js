@@ -4,10 +4,11 @@ const {
   connectToDatabase,
   disconnectFromDatabase
 } = require('../src/database/mongo');
-const should = chai.should();
 const server = require('../src/server');
 const Product = require('../src/database/product.model');
 const { MongoMemoryServer } = require('mongodb-memory-server');
+
+chai.should();
 chai.use(chaiHttp);
 
 let mongoServer;
